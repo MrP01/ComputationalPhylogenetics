@@ -1,0 +1,45 @@
+repos:
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    hooks:
+      - id: prettier
+        stages:
+          - commit
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+  - repo: https://github.com/psf/black
+    hooks:
+      - id: black
+        args:
+          - --safe
+          - --quiet
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    hooks:
+      - id: ruff
+  - repo: https://github.com/pre-commit/pygrep-hooks
+    hooks:
+      - id: python-check-blanket-noqa
+      - id: python-no-eval
+      - id: python-no-log-warn
+  - repo: https://github.com/asottile/pyupgrade
+    hooks:
+      - id: pyupgrade
+  - repo: local
+    hooks:
+      - id: pyright
+        name: pyright
+        entry: pyright
+        language: system
+        types:
+          - python
+        pass_filenames: false
+  - repo: https://github.com/myint/autoflake
+    hooks:
+      - id: autoflake
+        args:
+          - --in-place
+          - --remove-all-unused-imports
+          - --remove-unused-variables
+          - --remove-duplicate-keys
+          - --ignore-init-module-imports

@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "computationalphylogenetics"
+version = "0.1.0"
+description = ""
+authors = ["MrP01 <peter@waldert.at>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+nltk = "^3.8.1"
+pandas = "^2.0.2"
+
+[tool.nitpick]
+style = ["github://MrP01/lint-me-now/nitpick-base-style.toml", "github://MrP01/lint-me-now/nitpick-python-style.toml"]
+
+[tool.black]
+line-length = 120
+
+[tool.ruff]
+line-length = 120
+select = ["I001"]
+exclude = [".git", "**/__pycache__"]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
