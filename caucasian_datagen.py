@@ -150,7 +150,7 @@ history = model.fit(
     # monitoring validation loss and metrics
     # at the end of each epoch
     # validation_data=(kerasinputvalid, kerasoutputvalid),
-    # validation_split=0.2,
+    validation_split=0.2,
 )
 
 # Run the tests
