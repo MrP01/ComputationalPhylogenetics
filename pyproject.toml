@@ -6,12 +6,16 @@ authors = ["MrP01 <peter@waldert.at>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.10, <3.12"
 nltk = "^3.8.1"
 pandas = "^2.0.2"
+tensorflow = "^2.13.0"
 
 [tool.nitpick]
-style = ["github://MrP01/lint-me-now/nitpick-base-style.toml", "github://MrP01/lint-me-now/nitpick-python-style.toml"]
+style = [
+  "github://MrP01/lint-me-now/nitpick-base-style.toml",
+  "github://MrP01/lint-me-now/nitpick-python-style.toml",
+]
 
 [tool.black]
 line-length = 120
