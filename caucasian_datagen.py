@@ -48,7 +48,6 @@ def PrintToScreenAndCSV(ListToOutput):
 
 
 # Main body of code
-
 # Open CSV file for output
 f = open(CSVFileOutput, "w", encoding="UTF8", newline="")
 # Set up CSV
@@ -66,10 +65,8 @@ hu = importcsvcol(CSVFile, "Hurrian")
 
 cog = importcsvcol(CSVFile, "cog")
 
-
 # Create input lists. Because of the error checking, doing all the pairs at the same time
 # This could be made much better it not in a rush!
-
 inputcombinedlist = []
 outputcombinedlist = []
 endelist = []
@@ -94,12 +91,6 @@ for cogvalue, itemone, itemtwo, itemthree, itemfour, itemfive, itemsix in zip(co
         godelist.append(itemfive + "|" + itemone)
         hudelist.append(itemsix + "|" + itemone)
 
-
-# Split the data into four lists - 80% of each list into training, 20% into verification
-splitpoint = int(len(inputcombinedlist) * 0.8)
-InputTrain, InputValid = inputcombinedlist[:splitpoint], inputcombinedlist[splitpoint:]
-OutputTrain, OutputValid = outputcombinedlist[:splitpoint], outputcombinedlist[splitpoint:]
-
 # get all tokens from en and de into the tokeniser, so we can refer to each word as token
 for item in inputcombinedlist:
     t.fit_on_texts(item)
@@ -117,8 +108,7 @@ for item in godelist:
     t.fit_on_texts(item)
 
 # Add spaces to deal with bag-of-words modelling
-InputTrain = addspaces(InputTrain)
-InputValid = addspaces(InputValid)
+inputcombinedlist = addspaces(inputcombinedlist)
 
 # Create the test matrices
 EnTest = t.texts_to_matrix(addspaces(endelist), mode="count")
@@ -128,25 +118,11 @@ IcTest = t.texts_to_matrix(addspaces(icdelist), mode="count")
 GoTest = t.texts_to_matrix(addspaces(godelist), mode="count")
 HuTest = t.texts_to_matrix(addspaces(hudelist), mode="count")
 
-
 # Create Keras matrices, with appropriate training and validation data
-kerasinputtrain = t.texts_to_matrix(InputTrain, mode="count")
-kerasinputvalid = t.texts_to_matrix(InputValid, mode="count")
+KerasInput = t.texts_to_matrix(inputcombinedlist, mode="count")  # already a numpy array
+KerasOutput = np.array(outputcombinedlist, dtype=bool)
 
-
-categorysize = kerasinputtrain.shape[1]
-TrainSize = len(InputTrain)
-ValidSize = len(InputValid)
-
-# Preprocess the data (these are NumPy arrays)
-kerasinputtrain = kerasinputtrain.reshape(TrainSize, categorysize).astype("float32")
-kerasinputvalid = kerasinputvalid.reshape(ValidSize, categorysize).astype("float32")
-kerasoutputtrain = np.array(OutputTrain, dtype=bool)
-kerasoutputvalid = np.array(OutputValid, dtype=bool)
-
-
-# categorysize= len(t.word_index)+1
-
+categorysize = KerasInput.shape[1]
 
 # Create Model
 # This could almost certainly be improved... a lot!
@@ -155,8 +131,6 @@ model.add(Dense(128, input_dim=categorysize, activation="gelu"))
 model.add(Dense(128, activation="gelu"))
 model.add(Dense(128, activation="gelu"))
 model.add(Dense(1, activation="sigmoid"))
-
-
 model.compile(
     optimizer=keras.optimizers.SGD(learning_rate=0.001),
     loss=keras.losses.binary_crossentropy,
@@ -168,21 +142,20 @@ print(model.summary())
 
 print("Fit model on training data")
 history = model.fit(
-    kerasinputtrain,
-    kerasoutputtrain,
+    KerasInput,
+    KerasOutput,
     batch_size=32,
     epochs=10000,
     # We pass some validation for
     # monitoring validation loss and metrics
     # at the end of each epoch
-    validation_data=(kerasinputvalid, kerasoutputvalid),
+    # validation_data=(kerasinputvalid, kerasoutputvalid),
+    # validation_split=0.2,
 )
-
 
 # Run the tests
 # This is horrible, horrible code
 # Can be massively cleaned up... at some point
-
 PrintToScreenAndCSV(["Comparison", "Cognate? Model output", "Original En->De cognate answer"])
 
 for checklist in [
